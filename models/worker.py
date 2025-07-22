@@ -1,13 +1,11 @@
 from .enums.enums import ExperienceLevel
 from sqlalchemy import Column, Integer, String, Date, Text, Numeric, ForeignKey, Enum, relationship
-from sqlalchemy.sql import func
 from .base_model import BaseModel
 
 class Worker(BaseModel):
     __tablename__ = 'workers'
 
     # Columnas
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False, unique=True)
     first_name = Column(String(100), nullable=False)
     last_name = Column(String(100), nullable=False)
