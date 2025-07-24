@@ -45,7 +45,7 @@ class BaseController(Generic[T], ABC):
             return 0
     #Basic CRUD operations
     @abstractmethod
-    def create(self, data: Dict[str, Any]) -> bool:
+    def create(self, data) -> int:
         # try:
         #     with self.conn.get_cursor() as cursor:
         #         cursor.callproc(f'sp_create_{self.table_name}', [data['email'], data['password'], data['phone'], data['user_type']])
@@ -56,7 +56,7 @@ class BaseController(Generic[T], ABC):
         #     return False
         pass
     @abstractmethod    
-    def update(self, id:int, data: Dict[str, Any]) -> bool:
+    def update(self, id:int, data) -> bool:
         # try:
         #     with self.conn.get_cursor() as cursor:
         #         cursor.callproc(f'sp_update_{self.table_name}', [id, data['email'], data['password'], data['phone'], data['user_type'], data['is_active'], data['is_verified']])

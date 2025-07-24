@@ -4,8 +4,6 @@ from ..enums.enums import ReviewerType
 from .job import JobResponse
 
 class ReviewBase(BaseModel):
-    reviewer_id: int
-    reviewee_id: int
     reviewer_type: ReviewerType
     reviewee_type: ReviewerType
     rating: int
@@ -13,6 +11,8 @@ class ReviewBase(BaseModel):
 
 class ReviewCreate(ReviewBase):
     job_id: int
+    reviewer_id: int
+    reviewee_id: int
 
 class ReviewUpdate(BaseModel):
     rating: int | None = None
