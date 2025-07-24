@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date, Text, Numeric, ForeignKey, Enum, relationship
 from .base_model import BaseModel
-from .enums.enums import JobCategory, JobStatus, ExperienceLevel
+from ..enums.enums import JobCategory, JobOfferStatus, ExperienceLevel
 from datetime import time
 
 class JobOffers(BaseModel):
@@ -19,7 +19,7 @@ class JobOffers(BaseModel):
     hourly_rate = Column(Numeric(10, 2), nnullable=False)
     total_payment = Column(Numeric(10, 2), nullable=False)
     experience_level = Column(ExperienceLevel)
-    status = Column(JobStatus, default=JobStatus.AVAILABLE)
+    status = Column(JobOfferStatus, default=JobOfferStatus.AVAILABLE)
 
     # Relaciones
     company = relationship("Company", back_populates="job_offers")

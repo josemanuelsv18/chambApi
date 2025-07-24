@@ -1,0 +1,21 @@
+from .base import BaseSchema
+from .user import UserResponse
+from pydantic import BaseModel
+from ..enums.enums import AdminLevel
+
+class AdminBase(BaseModel):
+    first_name: str
+    last_name: str
+    admin_level: AdminLevel
+    created_by_admin_id: int | None = None # Optional field to track who created the admin
+
+class AdminCreate(AdminBase):
+    user_id: int
+
+class AdminUpdate(BaseModel):
+    first_name: str | None = None
+    last_name: str | None = None
+    admin_level: AdminLevel | None = None
+
+class AdminResponse(AdminBase, BaseSchema):
+    user: UserResponse

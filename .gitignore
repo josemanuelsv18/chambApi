@@ -35,4 +35,5 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# Jupyter
+# Database files
+*.sql

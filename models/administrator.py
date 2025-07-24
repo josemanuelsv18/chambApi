@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, ForeignKey, relationship, Enum
 from .base_model import BaseModel
-from .enums.enums import AdminLevel
+from ..enums.enums import AdminLevel
 
 class Administrator(BaseModel):
     __tablename__ = 'administrators'

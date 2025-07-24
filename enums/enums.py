@@ -31,7 +31,7 @@ class JobCategory(PyEnum):
     CLEANING = 'cleaning'
     DELIVERY = 'delivery'
     OTHER = 'other'
-class JobStatus(PyEnum):
+class JobOfferStatus(PyEnum):
     AVAILABLE = 'available'
     NOT_AVAILABLE = 'not available'
     CANCELLED = 'cancelled'

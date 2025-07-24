@@ -1,4 +1,4 @@
-from .enums.enums import ExperienceLevel
+from ..enums.enums import ExperienceLevel
 from sqlalchemy import Column, Integer, String, Date, Text, Numeric, ForeignKey, Enum, relationship
 from .base_model import BaseModel
 

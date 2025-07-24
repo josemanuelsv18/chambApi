@@ -66,5 +66,3 @@ class Connection:
             self.connection.rollback()  # Rollback in case of error
             print(f"An error occurred: {e}")
             raise e
-
-#_connection = Connection() # Instancia global de la conexión para ser utilizada en otros módulos

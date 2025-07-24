@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, Numeric, ForeignKey, Enum
 from sqlalchemy.sql import func
-from .enums.enums import CompanyStatus
+from ..enums.enums import CompanyStatus
 from .base_model import BaseModel
 
 class Company(BaseModel):
