@@ -12,7 +12,7 @@ class JobBase(BaseModel):
 class JobCreate(JobBase):
     job_offer_id: int
     worker_id: int 
-    application_id: str
+    application_id: int
 
 class JobUpdate(BaseModel):
     title: str | None = None

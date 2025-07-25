@@ -46,25 +46,9 @@ class BaseController(Generic[T], ABC):
     #Basic CRUD operations
     @abstractmethod
     def create(self, data) -> int:
-        # try:
-        #     with self.conn.get_cursor() as cursor:
-        #         cursor.callproc(f'sp_create_{self.table_name}', [data['email'], data['password'], data['phone'], data['user_type']])
-        #         self.conn.connection.commit()
-        #         return True
-        # except Exception as e:
-        #     print(f"Error creating record in table {self.table_name}: {e}")
-        #     return False
         pass
     @abstractmethod    
     def update(self, id:int, data) -> bool:
-        # try:
-        #     with self.conn.get_cursor() as cursor:
-        #         cursor.callproc(f'sp_update_{self.table_name}', [id, data['email'], data['password'], data['phone'], data['user_type'], data['is_active'], data['is_verified']])
-        #         self.conn.connection.commit()
-        #         return True
-        # except Exception as e:
-        #     print(f"Error updating record in table {self.table_name}: {e}")
-        #     return False
         pass
 
     def delete(self, id: int) -> bool:

@@ -1,10 +1,10 @@
-from typing import Union
 from fastapi import FastAPI
+from .database.connection import Connection
+from .routes.user_routes import UserRoutes
 
-class Main:
-    def __init__(self):
-        self.app = FastAPI()
+app = FastAPI()
+conn = Connection()
 
-if __name__ == "__main__":
-    app = Main()
-    app.main()
+# Incluye las rutas de usuario
+user_routes = UserRoutes.get_user_routes(conn)
+app.include_router(user_routes)

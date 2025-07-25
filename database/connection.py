@@ -59,6 +59,8 @@ class Connection:
 
     @contextmanager
     def get_cursor(self):
+        if not self.connection.is_connected():
+            self.open_connection()
         try:
             yield self.cursor
             self.connection.commit()  # Commit any changes if needed
@@ -66,3 +68,5 @@ class Connection:
             self.connection.rollback()  # Rollback in case of error
             print(f"An error occurred: {e}")
             raise e
+        finally:
+            self.close_connection()

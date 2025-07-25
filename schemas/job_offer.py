@@ -6,7 +6,7 @@ from .company import CompanyResponse
 
 class JobOfferBase(BaseModel):
     title: str
-    description: str
+    description: str | None = None
     category: JobCategory
     location: str
     start_date: date

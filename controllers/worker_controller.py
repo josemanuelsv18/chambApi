@@ -16,9 +16,9 @@ class WorkerController(BaseController):
                     data['first_name'],
                     data['last_name'],
                     data['date_of_birth'],
-                    data['profile_picture'],
-                    data['bio'],
-                    data['experience_level'].value,
+                    data.get('profile_picture'),
+                    data.get('bio'),
+                    data['experience_level'].value if data['experience_level'] else None,
                     data['location'],
                     0  # OUT param para el id generado
                 ]
@@ -35,19 +35,18 @@ class WorkerController(BaseController):
         data = worker_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
-                # Ajusta los campos y el procedimiento según tu modelo y SP
                 args = [
                     id,
-                    data['first_name'],
-                    data['last_name'],
-                    data['date_of_birth'],
-                    data['profile_picture'],
-                    data['bio'],
-                    data['experience_level'].value if data['experience_level'] else None,
-                    data['location'],
-                    data['rating'],
-                    data['completed_jobs'],
-                    data['balance']
+                    data.get('first_name'),
+                    data.get('last_name'),
+                    data.get('date_of_birth'),
+                    data.get('profile_picture'),
+                    data.get('bio'),
+                    data['experience_level'].value if data.get('experience_level') else None,
+                    data.get('location'),
+                    data.get('rating'),
+                    data.get('completed_jobs'),
+                    data.get('balance')
                 ]
                 cursor.callproc(f'sp_update_{self.table_name}', args)
                 self.conn.connection.commit()

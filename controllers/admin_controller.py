@@ -15,7 +15,7 @@ class AdminController(BaseController):
                     data['user_id'],
                     data['first_name'],
                     data['last_name'],
-                    data['admin_level'].value,
+                    data['admin_level'].value if data['admin_level'] else None,
                     data['created_by_admin_id'],
                     0  # OUT param para el id generado
                 ]
@@ -34,9 +34,9 @@ class AdminController(BaseController):
             with self.conn.get_cursor() as cursor:
                 args = [
                     id,
-                    data['first_name'],
-                    data['last_name'],
-                    data['admin_level'].value if data['admin_level'] else None
+                    data.get('first_name'),
+                    data.get('last_name'),
+                    data['admin_level'].value if data.get('admin_level') else None
                 ]
                 cursor.callproc(f'sp_update_{self.table_name}', args)
                 self.conn.connection.commit()

@@ -32,15 +32,36 @@ class UserController(BaseController):
             with self.conn.get_cursor() as cursor:
                 args = [
                     id,
-                    data['email'],
-                    data['password'],
-                    data['phone'],
-                    data['user_type'].value if data['user_type'] else None,
-                    data['is_active'],
-                    data['is_verified']]
+                    data.get('email'),
+                    data.get('password'),
+                    data.get('phone'),
+                    data['user_type'].value if data.get('user_type') else None,
+                    data.get('is_active'),
+                    data.get('is_verified')
+                ]
                 cursor.callproc(f'sp_update_{self.table_name}', args)
                 self.conn.connection.commit()
                 return True
         except Exception as e:
             print(f"Error updating record in table {self.table_name}: {e}")
+            return False
+
+    def exists_by_email(self, email: str) -> bool:
+        try:
+            query = f"SELECT 1 FROM {self.table_name} WHERE email = %s LIMIT 1"
+            with self.conn.get_cursor() as cursor:
+                cursor.execute(query, (email,))
+                return cursor.fetchone() is not None
+        except Exception as e:
+            print(f"Error checking existence by email: {e}")
+            return False
+
+    def exists_by_phone(self, phone: str) -> bool:
+        try:  
+            query = f"SELECT 1 FROM {self.table_name} WHERE phone = %s LIMIT 1"
+            with self.conn.get_cursor() as cursor:
+                cursor.execute(query, (phone,))
+                return cursor.fetchone() is not None
+        except Exception as e:
+            print(f"Error checking existence by phone: {e}")
             return False
