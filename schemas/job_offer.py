@@ -1,8 +1,9 @@
-from base import BaseModel
+from models.base_model import BaseModel
 from enums.enums import JobCategory, JobOfferStatus, ExperienceLevel
 from pydantic import BaseModel
 from datetime import date, time
 from schemas.company import CompanyResponse
+from schemas.base import BaseSchema
 
 class JobOfferBase(BaseModel):
     title: str
@@ -37,5 +38,5 @@ class JobOfferUpdate(BaseModel):
     experience_level: ExperienceLevel | None = None
     job_status: JobOfferStatus | None = None
 
-class JobOfferResponse(JobOfferBase, BaseModel):
+class JobOfferResponse(JobOfferBase, BaseSchema):
     company: CompanyResponse

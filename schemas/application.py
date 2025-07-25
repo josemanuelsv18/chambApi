@@ -3,7 +3,8 @@ from pydantic import BaseModel
 from enums.enums import ApplicationStatus
 from datetime import datetime
 from schemas.job_offer import JobOfferResponse
-from worker import WorkerResponse
+from schemas.worker import WorkerResponse
+from schemas.base import BaseSchema
 
 class ApplicationBase(BaseModel):
     application_status: ApplicationStatus
@@ -20,7 +21,7 @@ class ApplicationUpdate(BaseModel):
     company_reponse: str | None = None
     response_at: datetime | None = None
 
-class ApplicationResponse(ApplicationBase):
+class ApplicationResponse(ApplicationBase, BaseSchema):
     id: int
     job_offer: JobOfferResponse
     workwer: WorkerResponse

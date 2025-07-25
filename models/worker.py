@@ -1,5 +1,6 @@
 from enums.enums import ExperienceLevel
-from sqlalchemy import Column, Integer, String, Date, Text, Numeric, ForeignKey, Enum, relationship
+from sqlalchemy import Column, Integer, String, Date, Text, Numeric, ForeignKey, Enum
+from sqlalchemy.orm import relationship
 from models.base_model import BaseModel
 
 class Worker(BaseModel):

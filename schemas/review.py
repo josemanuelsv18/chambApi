@@ -1,4 +1,4 @@
-from base import BaseSchema
+from schemas.base import BaseSchema
 from pydantic import BaseModel
 from enums.enums import ReviewerType
 from schemas.job import JobResponse

@@ -1,4 +1,5 @@
-from sqlalchemy import CheckConstraint, Column, Integer, String, Date, Text, Numeric, ForeignKey, Enum, relationship
+from sqlalchemy import Column, Integer, String, Date, Text, Numeric, ForeignKey, Enum, CheckConstraint
+from sqlalchemy.orm import relationship
 from models.base_model import BaseModel
 from enums.enums import ReviewerType
 

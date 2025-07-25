@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String, Date, Text, Numeric, ForeignKey, Enum, relationship
+from sqlalchemy import Column, Integer, String, Date, Text, Numeric, ForeignKey, Enum, DateTime
+from sqlalchemy.orm import relationship
 from models.base_model import BaseModel
 from enums.enums import ApplicationStatus
 from datetime import datetime
@@ -9,10 +10,10 @@ class Application(BaseModel):
     job_offer_id = Column(Integer, ForeignKey('job_offers.id'), nullable=False)
     worker_id = Column(Integer, ForeignKey('workers.id'), nullable=False)
     status = Column(Enum(ApplicationStatus), default=ApplicationStatus.PENDING)
-    applied_at = Column(datetime, default=datetime.now)
+    applied_at = Column(DateTime, default=datetime.now)
     message = Column(Text)
     company_response = Column(Text)
-    responded_at = Column(datetime)
+    responded_at = Column(DateTime)
 
     # Relaciones
     job_offer = relationship("JobOffer", back_populates="applications")
