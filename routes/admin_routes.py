@@ -9,6 +9,20 @@ class AdminRoutes(BaseRoutes[AdminResponse, AdminCreate, AdminUpdate]):
         controller = AdminController(conn)
         super().__init__(controller, prefix="/admins", tags=["admins"])
 
+        @self.router.post("/", response_model=bool)
+        def create(item: AdminCreate):
+            success = self.controller.create(item)
+            if not success:
+                raise HTTPException(status_code=400, detail="Failed to create item")
+            return success
+        
+        @self.router.put("/{item_id}", response_model=bool)
+        def update(item_id: int, item: AdminUpdate):
+            success = self.controller.update(item_id, item)
+            if not success:
+                raise HTTPException(status_code=400, detail="Failed to update item")
+            return success
+
         @self.router.get("/{admin_id}/with_user", response_model=dict)
         def get_admin_with_user(admin_id: int):
             result = self.controller.get_admin_with_user(admin_id)

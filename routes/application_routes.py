@@ -9,6 +9,20 @@ class ApplicationRoutes(BaseRoutes[ApplicationResponse, ApplicationCreate, Appli
         controller = ApplicationController(conn)
         super().__init__(controller, prefix="/applications", tags=["applications"])
 
+        @self.router.post("/", response_model=bool)
+        def create(item: ApplicationCreate):
+            success = self.controller.create(item)
+            if not success:
+                raise HTTPException(status_code=400, detail="Failed to create item")
+            return success
+        
+        @self.router.put("/{item_id}", response_model=bool)
+        def update(item_id: int, item: ApplicationUpdate):
+            success = self.controller.update(item_id, item)
+            if not success:
+                raise HTTPException(status_code=400, detail="Failed to update item")
+            return success
+
         @self.router.get("/by_worker/{worker_id}", response_model=list)
         def get_applications_by_worker(worker_id: int):
             return self.controller.get_applications_by_worker(worker_id)

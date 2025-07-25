@@ -9,6 +9,20 @@ class UserRoutes(BaseRoutes[UserResponse, UserCreate, UserUpdate]):
         controller = UserController(conn)
         super().__init__(controller, prefix="/users", tags=["users"])
 
+        @self.router.post("/", response_model=bool)
+        def create(item: UserCreate):
+            success = self.controller.create(item)
+            if not success:
+                raise HTTPException(status_code=400, detail="Failed to create item")
+            return success
+        
+        @self.router.put("/{item_id}", response_model=bool)
+        def update(item_id: int, item: UserUpdate):
+            success = self.controller.update(item_id, item)
+            if not success:
+                raise HTTPException(status_code=400, detail="Failed to update item")
+            return success
+
         # additional route definitions
         @self.router.get("/exists/email/{email}", response_model=bool)
         def exists_by_email(email: str):
@@ -17,6 +31,7 @@ class UserRoutes(BaseRoutes[UserResponse, UserCreate, UserUpdate]):
         @self.router.get("/exists/phone/{phone}", response_model=bool)
         def exists_by_phone(phone: str):
             return self.controller.exists_by_phone(phone)
+        
 
 def get_user_routes(conn: Connection) -> APIRouter:
     return UserRoutes(conn).router

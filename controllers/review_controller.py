@@ -8,7 +8,7 @@ class ReviewController(BaseController):
     def __init__(self, conn: Connection):
         super().__init__('reviews', conn)
 
-    def create(self, review_data: ReviewCreate) -> int:
+    def create(self, review_data: ReviewCreate) -> bool:
         data = review_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
@@ -20,16 +20,14 @@ class ReviewController(BaseController):
                     data['reviewee_type'].value if data.get('reviewee_type') else None,
                     data['rating'],
                     data.get('comment'),
-                    0  # OUT param para el id generado
+                    0
                 ]
                 cursor.callproc(f'sp_create_{self.table_name}', args)
                 self.conn.connection.commit()
-                for result in cursor.stored_results():
-                    new_id = result.fetchone()[0]
-                return new_id
+                return True
         except Exception as e:
             print(f"Error creating record in table {self.table_name}: {e}")
-            return None
+            return False
 
     def update(self, id: int, review_data: ReviewUpdate) -> bool:
         data = review_data.model_dump()

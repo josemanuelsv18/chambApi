@@ -10,6 +10,20 @@ class JobOfferRoutes(BaseRoutes[JobOfferResponse, JobOfferCreate, JobOfferUpdate
         controller = JobOfferController(conn)
         super().__init__(controller, prefix="/job_offers", tags=["job_offers"])
 
+        @self.router.post("/", response_model=bool)
+        def create(item: JobOfferCreate):
+            success = self.controller.create(item)
+            if not success:
+                raise HTTPException(status_code=400, detail="Failed to create item")
+            return success
+        
+        @self.router.put("/{item_id}", response_model=bool)
+        def update(item_id: int, item: JobOfferUpdate):
+            success = self.controller.update(item_id, item)
+            if not success:
+                raise HTTPException(status_code=400, detail="Failed to update item")
+            return success
+
         @self.router.get("/{job_offer_id}/with_company", response_model=dict)
         def get_job_offer_with_company(job_offer_id: int):
             result = self.controller.get_job_offer_with_company(job_offer_id)

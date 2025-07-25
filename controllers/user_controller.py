@@ -6,7 +6,7 @@ class UserController(BaseController):
     def __init__(self, conn: Connection):
         super().__init__('users', conn)
 
-    def create(self, user_data: UserCreate) -> int:
+    def create(self, user_data: UserCreate) -> bool:
         data = user_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
@@ -19,13 +19,11 @@ class UserController(BaseController):
                 ]
                 cursor.callproc(f'sp_create_{self.table_name}', args)
                 self.conn.connection.commit()
-                for result in cursor.stored_results():
-                    new_id = result.fetchone()[0]
-                return new_id
+                return True
         except Exception as e:
             print(f"Error creating record in table {self.table_name}: {e}")
-            return None
-    
+            return False
+        
     def update(self, id: int, user_data: UserUpdate) -> bool:
         data = user_data.model_dump()
         try:

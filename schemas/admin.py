@@ -7,7 +7,7 @@ class AdminBase(BaseModel):
     first_name: str
     last_name: str
     admin_level: AdminLevel
-    created_by_admin_id: int
+    created_by_admin_id: int | None = None
 
 class AdminCreate(AdminBase):
     user_id: int

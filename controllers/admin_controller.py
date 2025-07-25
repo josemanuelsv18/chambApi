@@ -7,7 +7,7 @@ class AdminController(BaseController):
     def __init__(self, conn: Connection):
         super().__init__('administrators', conn)
 
-    def create(self, admin_data: AdminCreate) -> int:
+    def create(self, admin_data: AdminCreate) -> bool:
         data = admin_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
@@ -17,16 +17,14 @@ class AdminController(BaseController):
                     data['last_name'],
                     data['admin_level'].value if data['admin_level'] else None,
                     data['created_by_admin_id'],
-                    0  # OUT param para el id generado
+                    0
                 ]
                 cursor.callproc(f'sp_create_{self.table_name}', args)
                 self.conn.connection.commit()
-                for result in cursor.stored_results():
-                    new_id = result.fetchone()[0]
-                return new_id
+                return True
         except Exception as e:
             print(f"Error creating record in table {self.table_name}: {e}")
-            return None
+            return False
 
     def update(self, id: int, admin_data: AdminUpdate) -> bool:
         data = admin_data.model_dump()

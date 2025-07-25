@@ -30,5 +30,19 @@ class PaymentRoutes(BaseRoutes[PaymentResponse, PaymentCreate, PaymentUpdate]):
                 raise HTTPException(status_code=404, detail="No payments found with this status")
             return payments
 
+        @self.router.post("/", response_model=bool)
+        def create(item: PaymentCreate):
+            success = self.controller.create(item)
+            if not success:
+                raise HTTPException(status_code=400, detail="Failed to create item")
+            return success
+        
+        @self.router.put("/{item_id}", response_model=bool)
+        def update(item_id: int, item: PaymentUpdate):
+            success = self.controller.update(item_id, item)
+            if not success:
+                raise HTTPException(status_code=400, detail="Failed to update item")
+            return success
+
 def get_payment_routes(conn: Connection) -> APIRouter:
     return PaymentRoutes(conn).router

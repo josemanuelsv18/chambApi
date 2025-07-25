@@ -9,7 +9,7 @@ class JobOfferController(BaseController):
     def __init__(self, conn: Connection):
         super().__init__('job_offers', conn)
 
-    def create(self, job_offer_data: JobOfferCreate) -> int:
+    def create(self, job_offer_data: JobOfferCreate) -> bool:
         data = job_offer_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
@@ -17,7 +17,7 @@ class JobOfferController(BaseController):
                     data['company_id'],
                     data['title'],
                     data['description'],
-                    data['category'],
+                    data['category'].value if data.get('category') else None,
                     data['location'],
                     data['start_date'],
                     data['end_date'],
@@ -28,16 +28,14 @@ class JobOfferController(BaseController):
                     data['total_payment'],
                     data['experience_level'].value if data.get('experience_level') else None,
                     data['job_status'].value if data.get('job_status') else None,
-                    0  # OUT param para el id generado
+                    0
                 ]
                 cursor.callproc(f'sp_create_{self.table_name}', args)
                 self.conn.connection.commit()
-                for result in cursor.stored_results():
-                    new_id = result.fetchone()[0]
-                return new_id
+                return True
         except Exception as e:
             print(f"Error creating record in table {self.table_name}: {e}")
-            return None
+            return False
 
     def update(self, id: int, job_offer_data: JobOfferUpdate) -> bool:
         data = job_offer_data.model_dump()

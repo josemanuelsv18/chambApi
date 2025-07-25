@@ -7,7 +7,7 @@ class CompanyController(BaseController):
     def __init__(self, conn: Connection):
         super().__init__('companies', conn)
 
-    def create(self, company_data: CompanyCreate) -> int:
+    def create(self, company_data: CompanyCreate) -> bool:
         data = company_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
@@ -20,16 +20,14 @@ class CompanyController(BaseController):
                     data['logo'],
                     data['description'],
                     data['company_status'].value if data['company_status'] else None,
-                    0  # OUT param para el id generado
+                    0
                 ]
                 cursor.callproc(f'sp_create_{self.table_name}', args)
                 self.conn.connection.commit()
-                for result in cursor.stored_results():
-                    new_id = result.fetchone()[0]
-                return new_id
+                return True
         except Exception as e:
             print(f"Error creating record in table {self.table_name}: {e}")
-            return None
+            return False
         
     def update(self, id: int, company_data: CompanyUpdate) -> bool:
         data = company_data.model_dump()
@@ -83,7 +81,7 @@ class CompanyController(BaseController):
             print(f"Error fetching company by name: {e}")
             return None
         
-    def get_company_by_type(self, business_type: str) -> Optional[Dict[str, Any]]:
+    def get_company_by_type(self, business_type: str) -> list[Dict[str, Any]]:
         try:
             query = """
                 SELECT * FROM companies 
@@ -91,7 +89,7 @@ class CompanyController(BaseController):
             """
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (business_type,))
-                return cursor.fetchone()
+                return cursor.fetchall()
         except Exception as e:
             print(f"Error fetching company by type: {e}")
-            return None
+            return []

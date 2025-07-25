@@ -9,6 +9,20 @@ class CompanyRoutes(BaseRoutes[CompanyResponse, CompanyCreate, CompanyUpdate]):
         controller = CompanyController(conn)
         super().__init__(controller, prefix="/companies", tags=["companies"])
 
+        @self.router.post("/", response_model=bool)
+        def create(item: CompanyCreate):
+            success = self.controller.create(item)
+            if not success:
+                raise HTTPException(status_code=400, detail="Failed to create item")
+            return success
+        
+        @self.router.put("/{item_id}", response_model=bool)
+        def update(item_id: int, item: CompanyUpdate):
+            success = self.controller.update(item_id, item)
+            if not success:
+                raise HTTPException(status_code=400, detail="Failed to update item")
+            return success
+
         @self.router.get("/{company_id}/with_user", response_model=dict)
         def get_company_with_user(company_id: int):
             result = self.controller.get_company_with_user(company_id)

@@ -9,6 +9,20 @@ class ReviewRoutes(BaseRoutes[ReviewResponse, ReviewCreate, ReviewUpdate]):
         controller = ReviewController(conn)
         super().__init__(controller, prefix="/reviews", tags=["reviews"])
 
+        @self.router.post("/", response_model=bool)
+        def create(item: ReviewCreate):
+            success = self.controller.create(item)
+            if not success:
+                raise HTTPException(status_code=400, detail="Failed to create item")
+            return success
+        
+        @self.router.put("/{item_id}", response_model=bool)
+        def update(item_id: int, item: ReviewUpdate):
+            success = self.controller.update(item_id, item)
+            if not success:
+                raise HTTPException(status_code=400, detail="Failed to update item")
+            return success
+
         @self.router.get("/by_job/{job_id}", response_model=list)
         def get_reviews_by_job(job_id: int):
             reviews = self.controller.get_reviews_by_job(job_id)

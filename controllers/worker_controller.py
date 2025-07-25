@@ -7,7 +7,7 @@ class WorkerController(BaseController):
     def __init__(self, conn: Connection):
         super().__init__('workers', conn)
 
-    def create(self, worker_data: WorkerCreate) -> int:
+    def create(self, worker_data: WorkerCreate) -> bool:
         data = worker_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
@@ -20,16 +20,14 @@ class WorkerController(BaseController):
                     data.get('bio'),
                     data['experience_level'].value if data['experience_level'] else None,
                     data['location'],
-                    0  # OUT param para el id generado
+                    0
                 ]
                 cursor.callproc(f'sp_create_{self.table_name}', args)
                 self.conn.connection.commit()
-                for result in cursor.stored_results():
-                    new_id = result.fetchone()[0]
-                return new_id
+                return True
         except Exception as e:
             print(f"Error creating record in table {self.table_name}: {e}")
-            return None
+            return False
         
     def update(self, id: int, worker_data: WorkerUpdate) -> bool:
         data = worker_data.model_dump()
