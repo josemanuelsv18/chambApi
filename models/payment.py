@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, Date, Text, Numeric, ForeignKey, Enum, relationship
-from .base_model import BaseModel
-from ..enums.enums import PaymentStatus
+from models.base_model import BaseModel
+from enums.enums import PaymentStatus
 
 class Payment(BaseModel):
     __tablename__ = 'payments'

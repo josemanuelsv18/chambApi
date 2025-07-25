@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Boolean, ForeignKey, Enum
 from sqlalchemy.orm import relationship
-from .base_model import BaseModel
-from ..enums.enums import UserRole
+from models.base_model import BaseModel
+from enums.enums import UserRole
 
 class User(BaseModel):
     __tablename__ = "users"

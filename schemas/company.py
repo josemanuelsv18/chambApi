@@ -1,7 +1,7 @@
 from pydantic import BaseModel
-from ..enums.enums import CompanyStatus
-from .user import UserResponse
-from .base import BaseSchema
+from enums.enums import CompanyStatus
+from schemas.user import UserResponse
+from schemas.base import BaseSchema
 
 class CompanyBase(BaseModel):
     company_name: str

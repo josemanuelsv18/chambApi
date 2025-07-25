@@ -1,6 +1,6 @@
-from ..schemas.worker import WorkerCreate, WorkerUpdate
-from ..database.connection import Connection
-from .base_controller import BaseController
+from schemas.worker import WorkerCreate, WorkerUpdate
+from database.connection import Connection
+from controllers.base_controller import BaseController
 from typing import Optional, Dict, Any
 
 class WorkerController(BaseController):

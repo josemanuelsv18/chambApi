@@ -1,9 +1,9 @@
-from .base import BaseSchema
+from base import BaseSchema
 from pydantic import BaseModel
-from ..enums.enums import JobStatus
-from .job_offer import JobOfferResponse
-from .worker import WorkerResponse
-from .application import ApplicationResponse
+from enums.enums import JobStatus
+from schemas.job_offer import JobOfferResponse
+from schemas.worker import WorkerResponse
+from schemas.application import ApplicationResponse
 
 class JobBase(BaseModel):
     title: str

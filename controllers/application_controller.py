@@ -1,6 +1,6 @@
-from ..schemas.application import ApplicationCreate, ApplicationUpdate
-from ..database.connection import Connection
-from .base_controller import BaseController
+from schemas.application import ApplicationCreate, ApplicationUpdate
+from database.connection import Connection
+from controllers.base_controller import BaseController
 from typing import Optional, Dict, Any
 
 class ApplicationController(BaseController):
@@ -71,16 +71,3 @@ class ApplicationController(BaseController):
         except Exception as e:
             print(f"Error fetching applications by job offer: {e}")
             return []
-
-    def get_application_by_worker_id(self, worker_id: int) -> Optional[Dict[str, Any]]:
-        try:
-            query = """
-                SELECT * FROM applications
-                WHERE worker_id = %s
-            """
-            with self.conn.get_cursor() as cursor:
-                cursor.execute(query, (worker_id,))
-                return cursor.fetchone()
-        except Exception as e:
-            print(f"Error fetching application by worker ID: {e}")
-            return None

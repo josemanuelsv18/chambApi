@@ -1,6 +1,6 @@
-from ..schemas.user import UserCreate, UserUpdate
-from ..database.connection import Connection
-from .base_controller import BaseController
+from schemas.user import UserCreate, UserUpdate
+from database.connection import Connection
+from controllers.base_controller import BaseController
 
 class UserController(BaseController):
     def __init__(self, conn: Connection):

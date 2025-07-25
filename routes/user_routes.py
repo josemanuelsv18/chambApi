@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
-from ..controllers.user_controller import UserController
-from ..schemas.user import UserResponse, UserCreate, UserUpdate
-from .base_routes import BaseRoutes
-from ..database.connection import Connection
+from controllers.user_controller import UserController
+from schemas.user import UserResponse, UserCreate, UserUpdate
+from routes.base_routes import BaseRoutes
+from database.connection import Connection
 
 class UserRoutes(BaseRoutes[UserResponse, UserCreate, UserUpdate]):
     def __init__(self, conn: Connection):
@@ -18,6 +18,6 @@ class UserRoutes(BaseRoutes[UserResponse, UserCreate, UserUpdate]):
         def exists_by_phone(phone: str):
             return self.controller.exists_by_phone(phone)
 
-    def get_user_routes(conn: Connection) -> APIRouter:
-        return UserRoutes(conn).router
+def get_user_routes(conn: Connection) -> APIRouter:
+    return UserRoutes(conn).router
     

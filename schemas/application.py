@@ -1,9 +1,9 @@
 #from .base import BaseSchema
 from pydantic import BaseModel
-from ..enums.enums import ApplicationStatus
+from enums.enums import ApplicationStatus
 from datetime import datetime
-from .job_offer import JobOfferResponse
-from .worker import WorkerResponse
+from schemas.job_offer import JobOfferResponse
+from worker import WorkerResponse
 
 class ApplicationBase(BaseModel):
     application_status: ApplicationStatus

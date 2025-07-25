@@ -1,8 +1,8 @@
-from ..schemas.review import ReviewCreate, ReviewUpdate
-from ..database.connection import Connection
-from .base_controller import BaseController
+from schemas.review import ReviewCreate, ReviewUpdate
+from database.connection import Connection
+from controllers.base_controller import BaseController
 from typing import Optional, Dict, Any
-from ..enums.enums import ReviewerType
+from enums.enums import ReviewerType
 
 class ReviewController(BaseController):
     def __init__(self, conn: Connection):

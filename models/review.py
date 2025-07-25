@@ -1,6 +1,6 @@
 from sqlalchemy import CheckConstraint, Column, Integer, String, Date, Text, Numeric, ForeignKey, Enum, relationship
-from .base_model import BaseModel
-from ..enums.enums import ReviewerType
+from models.base_model import BaseModel
+from enums.enums import ReviewerType
 
 class Review(BaseModel):
     __tablename__ = 'reviews'

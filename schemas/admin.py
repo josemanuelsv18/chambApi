@@ -1,7 +1,7 @@
-from .base import BaseSchema
-from .user import UserResponse
+from schemas.base import BaseSchema
+from schemas.user import UserResponse
 from pydantic import BaseModel
-from ..enums.enums import AdminLevel
+from enums.enums import AdminLevel
 
 class AdminBase(BaseModel):
     first_name: str

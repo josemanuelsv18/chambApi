@@ -1,7 +1,7 @@
 from datetime import date
-from .base import BaseSchema
-from .user import UserResponse
-from ..enums.enums import ExperienceLevel
+from schemas.base import BaseSchema
+from schemas.user import UserResponse
+from enums.enums import ExperienceLevel
 from pydantic import BaseModel
 
 class WorkerBase(BaseModel):

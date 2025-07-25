@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
-from ..controllers.worker_controller import WorkerController
-from ..schemas.worker import WorkerResponse, WorkerCreate, WorkerUpdate
-from .base_routes import BaseRoutes
-from ..database.connection import Connection
+from controllers.worker_controller import WorkerController
+from schemas.worker import WorkerResponse, WorkerCreate, WorkerUpdate
+from routes.base_routes import BaseRoutes
+from database.connection import Connection
 
 class WorkerRoutes(BaseRoutes[WorkerResponse, WorkerCreate, WorkerUpdate]):
     def __init__(self, conn: Connection):

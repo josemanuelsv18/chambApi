@@ -1,7 +1,7 @@
-from .base import BaseSchema
+from base import BaseSchema
 from pydantic import BaseModel
-from ..enums.enums import ReviewerType
-from .job import JobResponse
+from enums.enums import ReviewerType
+from schemas.job import JobResponse
 
 class ReviewBase(BaseModel):
     reviewer_type: ReviewerType

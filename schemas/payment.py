@@ -1,7 +1,7 @@
-from .base import BaseSchema
+from base import BaseSchema
 from pydantic import BaseModel
-from ..enums.enums import PaymentStatus
-from .job import JobResponse
+from enums.enums import PaymentStatus
+from schemas.job import JobResponse
 
 class PaymentBase(BaseModel):
     amount: float

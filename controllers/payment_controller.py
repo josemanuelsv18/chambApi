@@ -1,8 +1,8 @@
-from ..schemas.payment import PaymentCreate, PaymentUpdate
-from ..database.connection import Connection
-from .base_controller import BaseController
+from schemas.payment import PaymentCreate, PaymentUpdate
+from database.connection import Connection
+from controllers.base_controller import BaseController
 from typing import Optional, Dict, Any
-from ..enums.enums import PaymentStatus
+from enums.enums import PaymentStatus
 
 class PaymentController(BaseController):
     def __init__(self, conn: Connection):

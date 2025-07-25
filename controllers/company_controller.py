@@ -1,6 +1,6 @@
-from ..schemas.company import CompanyCreate, CompanyUpdate
-from ..database.connection import Connection
-from .base_controller import BaseController
+from schemas.company import CompanyCreate, CompanyUpdate
+from database.connection import Connection
+from controllers.base_controller import BaseController
 from typing import Optional, Dict, Any
 
 class CompanyController(BaseController):

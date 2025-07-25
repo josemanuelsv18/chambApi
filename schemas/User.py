@@ -1,7 +1,7 @@
-from ..enums.enums import UserRole
+from enums.enums import UserRole
 from pydantic import BaseModel, EmailStr, field_validator
-from .custom_types import phone_number
-from .base import BaseSchema
+from schemas.custom_types import phone_number
+from schemas.base import BaseSchema
 
 class UserBase(BaseModel):
     email: EmailStr

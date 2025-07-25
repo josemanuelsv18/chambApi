@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from typing import Generic, TypeVar, List, Optional
-from ..controllers.base_controller import BaseController
+from controllers.base_controller import BaseController
 
 T = TypeVar('T')
 CreateSchema = TypeVar('CreateSchema')

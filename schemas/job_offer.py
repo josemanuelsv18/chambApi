@@ -1,8 +1,8 @@
-from .base import BaseModel
-from ..enums.enums import JobCategory, JobOfferStatus, ExperienceLevel
+from base import BaseModel
+from enums.enums import JobCategory, JobOfferStatus, ExperienceLevel
 from pydantic import BaseModel
 from datetime import date, time
-from .company import CompanyResponse
+from schemas.company import CompanyResponse
 
 class JobOfferBase(BaseModel):
     title: str

@@ -1,8 +1,8 @@
-from ..schemas.job import JobCreate, JobUpdate
-from ..database.connection import Connection
-from .base_controller import BaseController
+from schemas.job import JobCreate, JobUpdate
+from database.connection import Connection
+from controllers.base_controller import BaseController
 from typing import Optional, Dict, Any
-from ..enums.enums import JobStatus
+from enums.enums import JobStatus
 
 class JobController(BaseController):
     def __init__(self, conn: Connection):

@@ -1,8 +1,8 @@
-from ..schemas.job_offer import JobOfferCreate, JobOfferUpdate
-from ..database.connection import Connection
-from .base_controller import BaseController
+from schemas.job_offer import JobOfferCreate, JobOfferUpdate
+from database.connection import Connection
+from controllers.base_controller import BaseController
 from typing import Optional, Dict, Any
-from ..enums.enums import JobCategory, ExperienceLevel, JobOfferStatus
+from enums.enums import JobCategory, ExperienceLevel, JobOfferStatus
 from datetime import date
 
 class JobOfferController(BaseController):

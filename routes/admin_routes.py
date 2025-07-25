@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
-from ..controllers.admin_controller import AdminController
-from ..schemas.admin import AdminResponse, AdminCreate, AdminUpdate
-from .base_routes import BaseRoutes
-from ..database.connection import Connection
+from controllers.admin_controller import AdminController
+from schemas.admin import AdminResponse, AdminCreate, AdminUpdate
+from routes.base_routes import BaseRoutes
+from database.connection import Connection
 
 class AdminRoutes(BaseRoutes[AdminResponse, AdminCreate, AdminUpdate]):
     def __init__(self, conn: Connection):

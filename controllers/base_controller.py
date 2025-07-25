@@ -1,6 +1,6 @@
 from typing import TypeVar, Generic, Optional, List, Dict, Any
 from sqlalchemy.orm import Session
-from ..database.connection import Connection
+from database.connection import Connection
 from abc import ABC, abstractmethod
 
 T = TypeVar('T') # Type variable for generic type
