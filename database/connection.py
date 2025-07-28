@@ -1,5 +1,6 @@
 import os
-import mysql.connector
+import psycopg2
+import psycopg2.extras
 from dotenv import load_dotenv
 from contextlib import contextmanager
 
@@ -7,11 +8,11 @@ class Connection:
     def __init__(self):
         # Cargar las variables de entorno desde el archivo .env
         load_dotenv()
-        self.host = os.getenv("MYSQL_HOST")
-        self.port = os.getenv("MYSQL_PORT")
-        self.user = os.getenv("MYSQL_USER")
-        self.password = os.getenv("MYSQL_PASSWORD")
-        self.database = os.getenv("MYSQL_DATABASE")
+        self.host = os.getenv("POSTGRES_HOST")
+        self.port = os.getenv("POSTGRES_PORT")
+        self.user = os.getenv("POSTGRES_USER")
+        self.password = os.getenv("POSTGRES_PASSWORD")
+        self.database = os.getenv("POSTGRES_DATABASE")
         # Inicializar la conexión y el cursor
         self._connection = None
         self._cursor = None
@@ -19,47 +20,59 @@ class Connection:
     #propiedades computadas para manejar la conexión y el cursor
     @property
     def connection(self):
-        if not self._connection or not self._connection.is_connected(): # Verifica si la conexión está abierta
+        if not self._connection or self._connection.closed: # Verifica si la conexión está abierta
             self.open_connection()
         return self._connection
     
     @property
     def cursor(self):
-        if not self._cursor or not self._connection.is_connected(): # Verifica si el cursor está abierto
+        if not self._cursor or (self._connection and self._connection.closed): # Verifica si el cursor está abierto
             self.open_connection()
-            self._cursor = self._connection.cursor()
+            self._cursor = self._connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return self._cursor
 
     # Método para abrir la conexión a la base de datos
     def open_connection(self):
         try:
             # Crear una nueva conexión a la base de datos
-            self._connection = mysql.connector.connect(
+            self._connection = psycopg2.connect(
                 host=self.host,
                 port=self.port,
                 user=self.user,
                 password=self.password,
                 database=self.database
             )
-            if self._connection.is_connected(): # Verifica si la conexión se ha establecido correctamente
-                print("Connected to MySQL version: ", self.connection.get_server_info())
-                self._cursor = self._connection.cursor(dictionary=True) # Cursor con diccionario para resultados más legibles
+            if not self._connection.closed: # Verifica si la conexión se ha establecido correctamente
+                # Obtener versión de manera más segura
+                try:
+                    cursor = self._connection.cursor()
+                    cursor.execute("SELECT version();")
+                    version = cursor.fetchone()[0]
+                    print(f"Connected to PostgreSQL: {version}")
+                    cursor.close()
+                except Exception as e:
+                    print(f"Connected to PostgreSQL (version info unavailable): {e}")
+                
+                self._cursor = self._connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor) # Cursor con diccionario para resultados más legibles
                 return True
-        except mysql.connector.Error as e:
+        except psycopg2.Error as e:
             print(f"Database connection failed: {e}")
             return False
         
     def close_connection(self):
         if self._cursor:
             self._cursor.close()
+            self._cursor = None
             print("Cursor closed.")
-        if self._connection and self._connection.is_connected():
+        if self._connection and not self._connection.closed:
             self._connection.close()
+            self._connection = None
             print("Connection closed.")
 
     @contextmanager
     def get_cursor(self):
-        if not self.connection.is_connected():
+        # Cambiar el orden: verificar None ANTES de acceder a .closed
+        if self._connection is None or self._connection.closed:
             self.open_connection()
         try:
             yield self.cursor

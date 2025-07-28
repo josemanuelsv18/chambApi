@@ -2,6 +2,7 @@ from schemas.application import ApplicationCreate, ApplicationUpdate
 from database.connection import Connection
 from controllers.base_controller import BaseController
 from typing import Optional, Dict, Any
+import psycopg2
 
 class ApplicationController(BaseController):
     def __init__(self, conn: Connection):
@@ -11,18 +12,21 @@ class ApplicationController(BaseController):
         data = application_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
-                args = [
-                    data['job_offer_id'],
-                    data['worker_id'],
-                    data['application_status'].value if data.get('application_status') else None,
-                    data['applied_at'],
-                    data.get('message'),
-                    0
-                ]
-                cursor.callproc(f'sp_create_{self.table_name}', args)
-                self.conn.connection.commit()
+                cursor.execute(
+                    f"SELECT sp_create_{self.table_name}(%s, %s, %s, %s, %s, %s)",
+                    (
+                        data['job_offer_id'],
+                        data['worker_id'],
+                        data['application_status'].value if data.get('application_status') else None,
+                        data['applied_at'],
+                        data.get('message'),
+                        0
+                    )
+                )
+                result = cursor.fetchone()
+                print(f"Application created, id: {result}")
                 return True
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error creating record in table {self.table_name}: {e}")
             return False
 
@@ -30,17 +34,18 @@ class ApplicationController(BaseController):
         data = application_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
-                args = [
-                    id,
-                    data['application_status'].value if data.get('application_status') else None,
-                    data.get('message'),
-                    data.get('company_response'),
-                    data.get('response_at')
-                ]
-                cursor.callproc(f'sp_update_{self.table_name}', args)
-                self.conn.connection.commit()
+                cursor.execute(
+                    f"SELECT sp_update_{self.table_name}(%s, %s, %s, %s, %s)",
+                    (
+                        id,
+                        data['application_status'].value if data.get('application_status') else None,
+                        data.get('message'),
+                        data.get('company_response'),
+                        data.get('response_at')
+                    )
+                )
                 return True
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error updating record in table {self.table_name}: {e}")
             return False
 
@@ -53,7 +58,7 @@ class ApplicationController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (worker_id,))
                 return cursor.fetchall()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching applications by worker: {e}")
             return []
 
@@ -66,6 +71,6 @@ class ApplicationController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (job_offer_id,))
                 return cursor.fetchall()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching applications by job offer: {e}")
             return []

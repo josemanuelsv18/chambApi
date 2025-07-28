@@ -3,6 +3,7 @@ from database.connection import Connection
 from controllers.base_controller import BaseController
 from typing import Optional, Dict, Any
 from enums.enums import ReviewerType
+import psycopg2
 
 class ReviewController(BaseController):
     def __init__(self, conn: Connection):
@@ -12,20 +13,23 @@ class ReviewController(BaseController):
         data = review_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
-                args = [
-                    data['job_id'],
-                    data['reviewer_id'],
-                    data['reviewee_id'],
-                    data['reviewer_type'].value if data.get('reviewer_type') else None,
-                    data['reviewee_type'].value if data.get('reviewee_type') else None,
-                    data['rating'],
-                    data.get('comment'),
-                    0
-                ]
-                cursor.callproc(f'sp_create_{self.table_name}', args)
-                self.conn.connection.commit()
+                cursor.execute(
+                    f"SELECT sp_create_{self.table_name}(%s, %s, %s, %s, %s, %s, %s, %s)",
+                    (
+                        data['job_id'],
+                        data['reviewer_id'],
+                        data['reviewee_id'],
+                        data['reviewer_type'].value if data.get('reviewer_type') else None,
+                        data['reviewee_type'].value if data.get('reviewee_type') else None,
+                        data['rating'],
+                        data.get('comment'),
+                        0
+                    )
+                )
+                result = cursor.fetchone()
+                print(f"Review created, id: {result}")
                 return True
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error creating record in table {self.table_name}: {e}")
             return False
 
@@ -33,15 +37,16 @@ class ReviewController(BaseController):
         data = review_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
-                args = [
-                    id,
-                    data.get('rating'),
-                    data.get('comment')
-                ]
-                cursor.callproc(f'sp_update_{self.table_name}', args)
-                self.conn.connection.commit()
+                cursor.execute(
+                    f"SELECT sp_update_{self.table_name}(%s, %s, %s)",
+                    (
+                        id,
+                        data.get('rating'),
+                        data.get('comment')
+                    )
+                )
                 return True
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error updating record in table {self.table_name}: {e}")
             return False
 
@@ -54,7 +59,7 @@ class ReviewController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (job_id,))
                 return cursor.fetchall()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching reviews by job: {e}")
             return []
 
@@ -67,7 +72,7 @@ class ReviewController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (reviewer_id,))
                 return cursor.fetchall()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching reviews by reviewer: {e}")
             return []
 
@@ -80,7 +85,7 @@ class ReviewController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (reviewee_id,))
                 return cursor.fetchall()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching reviews by reviewee: {e}")
             return []
 
@@ -93,5 +98,6 @@ class ReviewController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (reviewer_type.value,))
                 return cursor.fetchall()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching reviews by type: {e}")
+            return []

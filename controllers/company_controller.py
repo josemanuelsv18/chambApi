@@ -2,6 +2,7 @@ from schemas.company import CompanyCreate, CompanyUpdate
 from database.connection import Connection
 from controllers.base_controller import BaseController
 from typing import Optional, Dict, Any
+import psycopg2
 
 class CompanyController(BaseController):
     def __init__(self, conn: Connection):
@@ -11,21 +12,24 @@ class CompanyController(BaseController):
         data = company_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
-                args = [
-                    data['user_id'],
-                    data['company_name'],
-                    data['business_type'],
-                    data['address'],
-                    data['contact_person'],
-                    data['logo'],
-                    data['description'],
-                    data['company_status'].value if data['company_status'] else None,
-                    0
-                ]
-                cursor.callproc(f'sp_create_{self.table_name}', args)
-                self.conn.connection.commit()
+                cursor.execute(
+                    f"SELECT sp_create_{self.table_name}(%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (
+                        data['user_id'],
+                        data['company_name'],
+                        data['business_type'],
+                        data['address'],
+                        data['contact_person'],
+                        data['logo'],
+                        data['description'],
+                        data['company_status'].value if data['company_status'] else None,
+                        0
+                    )
+                )
+                result = cursor.fetchone()
+                print(f"Company created, id: {result}")
                 return True
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error creating record in table {self.table_name}: {e}")
             return False
         
@@ -33,23 +37,24 @@ class CompanyController(BaseController):
         data = company_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
-                args = [
-                    id,
-                    data.get('company_name'),
-                    data.get('business_type'),
-                    data.get('address'),
-                    data.get('contact_person'),
-                    data.get('logo'),
-                    data.get('description'),
-                    data.get('rating'),
-                    data.get('total_jobs_posted'),
-                    data.get('balance'),
-                    data['status'].value if data.get('status') else None
-                ]
-                cursor.callproc(f'sp_update_{self.table_name}', args)
-                self.conn.connection.commit()
+                cursor.execute(
+                    f"SELECT sp_update_{self.table_name}(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                    (
+                        id,
+                        data.get('company_name'),
+                        data.get('business_type'),
+                        data.get('address'),
+                        data.get('contact_person'),
+                        data.get('logo'),
+                        data.get('description'),
+                        data.get('rating'),
+                        data.get('total_jobs_posted'),
+                        data.get('balance'),
+                        data['status'].value if data.get('status') else None
+                    )
+                )
                 return True
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error updating record in table {self.table_name}: {e}")
             return False
     
@@ -64,7 +69,7 @@ class CompanyController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (company_id,))
                 return cursor.fetchone()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching company with user: {e}")
             return None
         
@@ -77,7 +82,7 @@ class CompanyController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (company_name,))
                 return cursor.fetchone()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching company by name: {e}")
             return None
         
@@ -90,6 +95,6 @@ class CompanyController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (business_type,))
                 return cursor.fetchall()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching company by type: {e}")
             return []

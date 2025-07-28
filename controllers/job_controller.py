@@ -3,6 +3,7 @@ from database.connection import Connection
 from controllers.base_controller import BaseController
 from typing import Optional, Dict, Any
 from enums.enums import JobStatus
+import psycopg2
 
 class JobController(BaseController):
     def __init__(self, conn: Connection):
@@ -12,18 +13,21 @@ class JobController(BaseController):
         data = job_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
-                args = [
-                    data['job_offer_id'],
-                    data['worker_id'],
-                    data['application_id'],
-                    data['title'],
-                    data['job_status'].value if data.get('job_status') else None,
-                    0
-                ]
-                cursor.callproc(f'sp_create_{self.table_name}', args)
-                self.conn.connection.commit()
+                cursor.execute(
+                    f"SELECT sp_create_{self.table_name}(%s, %s, %s, %s, %s, %s)",
+                    (
+                        data['job_offer_id'],
+                        data['worker_id'],
+                        data['application_id'],
+                        data['title'],
+                        data['status'].value if data.get('status') else None,
+                        0
+                    )
+                )
+                result = cursor.fetchone()
+                print(f"Job created, id: {result}")
                 return True
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error creating record in table {self.table_name}: {e}")
             return False
 
@@ -31,15 +35,16 @@ class JobController(BaseController):
         data = job_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
-                args = [
-                    id,
-                    data.get('title'),
-                    data['job_status'].value if data.get('job_status') else None
-                ]
-                cursor.callproc(f'sp_update_{self.table_name}', args)
-                self.conn.connection.commit()
+                cursor.execute(
+                    f"SELECT sp_update_{self.table_name}(%s, %s, %s)",
+                    (
+                        id,
+                        data.get('title'),
+                        data['status'].value if data.get('status') else None
+                    )
+                )
                 return True
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error updating record in table {self.table_name}: {e}")
             return False
 
@@ -52,7 +57,7 @@ class JobController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (worker_id,))
                 return cursor.fetchall()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching jobs by worker: {e}")
             return []
 
@@ -65,13 +70,12 @@ class JobController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (status.value,))
                 return cursor.fetchall()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching jobs by status: {e}")
             return []
         
     def get_job_with_details(self, job_id: int) -> Optional[Dict[str, Any]]:
         try:
-            # Fetch job details along with related job offer, worker, and application information
             query = """
                 SELECT j.*, jo.title as job_offer_title, w.first_name as worker_first_name, a.application_status
                 FROM jobs j
@@ -83,6 +87,6 @@ class JobController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (job_id,))
                 return cursor.fetchone()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching job with details: {e}")
             return None

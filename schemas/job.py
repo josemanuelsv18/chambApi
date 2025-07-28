@@ -7,7 +7,7 @@ from schemas.application import ApplicationResponse
 
 class JobBase(BaseModel):
     title: str
-    job_status: JobStatus
+    status: JobStatus
 
 class JobCreate(JobBase):
     job_offer_id: int
@@ -16,7 +16,7 @@ class JobCreate(JobBase):
 
 class JobUpdate(BaseModel):
     title: str | None = None
-    job_status: JobStatus | None = None
+    status: JobStatus | None = None
 
 class JobResponse(JobBase, BaseSchema):
     job_offer: JobOfferResponse

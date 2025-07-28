@@ -3,6 +3,7 @@ from database.connection import Connection
 from controllers.base_controller import BaseController
 from typing import Optional, Dict, Any
 from enums.enums import PaymentStatus
+import psycopg2
 
 class PaymentController(BaseController):
     def __init__(self, conn: Connection):
@@ -12,18 +13,21 @@ class PaymentController(BaseController):
         data = payment_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
-                args = [
-                    data['job_id'],
-                    data['amount'],
-                    data['payment_status'].value if data.get('payment_status') else None,
-                    data['payment_method'],
-                    data.get('payment_details'),
-                    0
-                ]
-                cursor.callproc(f'sp_create_{self.table_name}', args)
-                self.conn.connection.commit()
+                cursor.execute(
+                    f"SELECT sp_create_{self.table_name}(%s, %s, %s, %s, %s, %s)",
+                    (
+                        data['job_id'],
+                        data['amount'],
+                        data['payment_status'].value if data.get('payment_status') else None,
+                        data['payment_method'],
+                        data.get('payment_details'),
+                        0
+                    )
+                )
+                result = cursor.fetchone()
+                print(f"Payment created, id: {result}")
                 return True
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error creating record in table {self.table_name}: {e}")
             return False
 
@@ -31,15 +35,16 @@ class PaymentController(BaseController):
         data = payment_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
-                args = [
-                    id,
-                    data['payment_status'].value if data.get('payment_status') else None,
-                    data.get('payment_details')
-                ]
-                cursor.callproc(f'sp_update_{self.table_name}', args)
-                self.conn.connection.commit()
+                cursor.execute(
+                    f"SELECT sp_update_{self.table_name}(%s, %s, %s)",
+                    (
+                        id,
+                        data['payment_status'].value if data.get('payment_status') else None,
+                        data.get('payment_details')
+                    )
+                )
                 return True
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error updating record in table {self.table_name}: {e}")
             return False
 
@@ -52,14 +57,14 @@ class PaymentController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (job_id,))
                 return cursor.fetchall()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching payments by job: {e}")
             return []
         
     def get_payments_with_job_details(self, job_id: int) -> list[Dict[str, Any]]:
         try:
             query = """
-                SELECT p.*, j.title, j.job_status, j.worker_id, j.application_id
+                SELECT p.*, j.title, j.status, j.worker_id, j.application_id
                 FROM payments p
                 JOIN jobs j ON p.job_id = j.id
                 WHERE p.job_id = %s
@@ -67,7 +72,7 @@ class PaymentController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (job_id,))
                 return cursor.fetchall()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching payments with job details: {e}")
             return []
 
@@ -80,6 +85,6 @@ class PaymentController(BaseController):
             with self.conn.get_cursor() as cursor:
                 cursor.execute(query, (status.value,))
                 return cursor.fetchall()
-        except Exception as e:
+        except psycopg2.Error as e:
             print(f"Error fetching payments by status: {e}")
             return []

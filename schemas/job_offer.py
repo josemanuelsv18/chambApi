@@ -18,7 +18,7 @@ class JobOfferBase(BaseModel):
     hourly_rate: float
     total_payment: float
     experience_level: ExperienceLevel
-    job_status: JobOfferStatus
+    status: JobOfferStatus
 
 class JobOfferCreate(JobOfferBase):
     company_id: int
@@ -36,7 +36,7 @@ class JobOfferUpdate(BaseModel):
     hourly_rate: float | None = None
     total_payment: float | None = None
     experience_level: ExperienceLevel | None = None
-    job_status: JobOfferStatus | None = None
+    status: JobOfferStatus | None = None
 
 class JobOfferResponse(JobOfferBase, BaseSchema):
     company: CompanyResponse
