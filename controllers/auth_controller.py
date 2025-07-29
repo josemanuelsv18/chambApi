@@ -78,9 +78,42 @@ class AuthController:
             return None
         
     def login(self, login_data: LoginRequest) -> Optional[TokenResponse]:
+        # Proceso de login completo
+        # Autenticar usuario
         user = self.authenticate_user(login_data.email, login_data.password)
         if not user:
             return None
         
+        # Crear tokens
+        token_data = {"sub": str(user.user_id), "email": user.email, "user_type": user.user_type}
+        access_token = JWTConfig.create_access_token(token_data)
+        refresh_token = JWTConfig.create_refresh_token({"sub": str(user.user_id)})
+        
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            expires_in=JWTConfig.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        )
+        
     def refresh_access_token(self, refresh_token: str) -> Optional[TokenResponse]:
-        pass
+        # Renovar access token usando refresh token
+        payload = JWTConfig.verify_token(refresh_token)
+        
+        if not payload or payload.get("type") != "refresh":
+            return None
+        
+        user_id = int(payload.get("sub"))
+        user = self.get_user_by_id(user_id)
+        
+        if not user:
+            return None
+        
+        # Crear nuevo access token
+        token_data = {"sub": str(user.user_id), "email": user.email, "user_type": user.user_type}
+        access_token = JWTConfig.create_access_token(token_data)
+        
+        return TokenResponse(
+            access_token=access_token,
+            refresh_token=refresh_token,  # Mantener el mismo refresh token
+            expires_in=JWTConfig.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        )
