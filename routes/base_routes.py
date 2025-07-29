@@ -26,20 +26,6 @@ class BaseRoutes(Generic[T, CreateSchema, UpdateSchema]):
             if not item:
                 raise HTTPException(status_code=404, detail="Item not found")
             return item
-        
-        # @self.router.post("/", response_model=int)
-        # def create(item: CreateSchema):
-        #     item_id = self.controller.create(item)
-        #     if not item_id:
-        #         raise HTTPException(status_code=400, detail="Failed to create item")
-        #     return item_id
-        
-        # @self.router.put("/{item_id}", response_model=bool)
-        # def update(item_id: int, item: UpdateSchema):
-        #     success = self.controller.update(item_id, item)
-        #     if not success:
-        #         raise HTTPException(status_code=400, detail="Failed to update item")
-        #     return success
 
         @self.router.delete("/{item_id}", response_model=bool)
         def delete(item_id: int):
