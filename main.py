@@ -10,7 +10,7 @@ from routes.application_routes import get_application_routes
 from routes.job_routes import get_job_routes
 from routes.payment_routes import get_payment_routes
 from routes.review_routes import get_review_routes
-#from routes.auth_routes import get_auth_routes
+from routes.auth_routes import get_auth_routes
 
 class MainApp:
     def __init__(self):
@@ -29,7 +29,7 @@ class MainApp:
         )
 
     def include_routes(self):
-       #self.app.include_router(get_auth_routes(self.conn))  # Agregar auth routes primero
+        self.app.include_router(get_auth_routes(self.conn))
         self.app.include_router(get_user_routes(self.conn))
         self.app.include_router(get_worker_routes(self.conn))
         self.app.include_router(get_admin_routes(self.conn))

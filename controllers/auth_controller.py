@@ -9,12 +9,12 @@ class AuthController:
     def __init__(self, conn: Connection):
         self.conn = conn
         self.pwd_context = CryptContext(
-            schemes=["aragon2"],
-            argon2__time_cost=3,  # Iteration count
-            argon2__memory_cost=65536,  # 64 MB
-            argon2__parallelism=4,  # Number of threads
-            argon2__hash_len=32,  # Length of the hash
-            argon2__salt_len=16  # Length of the salt
+            schemes=["argon2"],
+            argon2__time_cost=3,
+            argon2__memory_cost=65536,
+            argon2__parallelism=4,
+            argon2__hash_len=32,
+            argon2__salt_len=16
         )
 
     @property
@@ -26,7 +26,7 @@ class AuthController:
         try:
             with self.conn.get_cursor() as cursor:
                 cursor.execute("""
-                    SELECT id, email, password, usert_type, is_active, is_verified
+                    SELECT id, email, password, user_type, is_active, is_verified
                     FROM users
                     WHERE email = %s AND is_active = true
                 """, (login_data.email.lower(),))
@@ -80,7 +80,7 @@ class AuthController:
     def login(self, login_data: LoginRequest) -> Optional[TokenResponse]:
         # Proceso de login completo
         # Autenticar usuario
-        user = self.authenticate_user(login_data.email, login_data.password)
+        user = self.authenticate_user(login_data)  # Era: login_data.email, login_data.password
         if not user:
             return None
         

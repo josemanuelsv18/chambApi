@@ -21,26 +21,29 @@ class Connection:
     @property
     def connection(self):
         if not self._connection or self._connection.closed: # Verifica si la conexión está abierta
-            self.open_connection()
+            if not self.open_connection():
+                return None
         return self._connection
     
     @property
     def cursor(self):
         if not self._cursor or (self._connection and self._connection.closed): # Verifica si el cursor está abierto
-            self.open_connection()
+            if not self.open_connection():
+                return None
             self._cursor = self._connection.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         return self._cursor
 
     # Método para abrir la conexión a la base de datos
     def open_connection(self):
         try:
-            # Crear una nueva conexión a la base de datos
+            # Crear una nueva conexión a la base de datos con SSL
             self._connection = psycopg2.connect(
                 host=self.host,
                 port=self.port,
                 user=self.user,
                 password=self.password,
-                database=self.database
+                database=self.database,
+                sslmode='require'  # Agregar SSL requerido para Render
             )
             if not self._connection.closed: # Verifica si la conexión se ha establecido correctamente
                 # Obtener versión de manera más segura
@@ -57,6 +60,8 @@ class Connection:
                 return True
         except psycopg2.Error as e:
             print(f"Database connection failed: {e}")
+            self._connection = None
+            self._cursor = None
             return False
         
     def close_connection(self):
@@ -71,14 +76,23 @@ class Connection:
 
     @contextmanager
     def get_cursor(self):
-        # Cambiar el orden: verificar None ANTES de acceder a .closed
+        # Verificar y abrir conexión si es necesario
         if self._connection is None or self._connection.closed:
-            self.open_connection()
+            if not self.open_connection():
+                raise psycopg2.Error("No se pudo establecer conexión con la base de datos")
+        
+        # Verificar que tenemos conexión válida antes de continuar
+        if self._connection is None:
+            raise psycopg2.Error("Conexión a la base de datos no disponible")
+            
         try:
             yield self.cursor
-            self.connection.commit()  # Commit any changes if needed
+            if self._connection and not self._connection.closed:
+                self._connection.commit()  # Commit any changes if needed
         except Exception as e:
-            self.connection.rollback()  # Rollback in case of error
+            # Solo hacer rollback si tenemos conexión válida
+            if self._connection and not self._connection.closed:
+                self._connection.rollback()  # Rollback in case of error
             print(f"An error occurred: {e}")
             raise e
         finally:

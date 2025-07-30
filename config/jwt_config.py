@@ -2,9 +2,15 @@ from datetime import datetime, timedelta
 from typing import Optional
 import os
 from jose import JWTError, jwt
+from dotenv import load_dotenv
+
+# Asegurar que se carguen las variables de entorno
+load_dotenv()
 
 class JWTConfig:
-    SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key-change-this-in-production")
+    SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+    if not SECRET_KEY:
+        raise ValueError("JWT_SECRET_KEY no está configurado en las variables de entorno")
     ALGORITHM = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES = 30
     REFRESH_TOKEN_EXPIRE_DAYS = 7
