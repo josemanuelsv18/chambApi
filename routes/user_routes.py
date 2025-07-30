@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from controllers.user_controller import UserController
-from schemas.user import UserResponse, UserCreate, UserUpdate
+from schemas.User import UserResponse, UserCreate, UserUpdate
 from routes.base_routes import BaseRoutes
 from database.connection import Connection
 
