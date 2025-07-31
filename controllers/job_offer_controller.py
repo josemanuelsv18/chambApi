@@ -24,14 +24,14 @@ class JobOfferController(BaseController):
                         data['location'],
                         data['start_date'],
                         data['end_date'],
-                        data['start_time'],
-                        data['end_time'],
+                        str(data['start_time']),  # Convertir a string
+                        str(data['end_time']),    # Convertir a string
                         data['required_workers'],
                         data['hourly_rate'],
                         data['total_payment'],
                         data['experience_level'].value if data.get('experience_level') else None,
                         data['status'].value if data.get('status') else None,
-                        0
+                        0  # !!!
                     )
                 )
                 result = cursor.fetchone()

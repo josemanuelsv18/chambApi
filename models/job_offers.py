@@ -5,7 +5,7 @@ from enums.enums import JobCategory, JobOfferStatus, ExperienceLevel
 from sqlalchemy import Time
 
 class JobOffers(BaseModel):
-    __tablename__ = 'job_offerss'
+    __tablename__ = 'job_offers'
 
     company_id = Column(Integer, ForeignKey('companies.id'), nullable=False)
     title = Column(String(255), nullable=False)
