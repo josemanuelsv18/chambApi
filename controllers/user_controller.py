@@ -63,8 +63,9 @@ class UserController(BaseController):
     def exists_by_email(self, email: str) -> bool:
         try:
             with self.conn.get_cursor() as cursor:
-                cursor.execute(f"SELECT check_email_exists_{self.table_name}(%s)", (email,))
-                return True
+                cursor.execute(f"SELECT 1 FROM {self.table_name} WHERE email = %s LIMIT 1", (email,))
+                result = cursor.fetchone()
+                return bool(result)
         except psycopg2.Error as e:
             print(f"Error checking existence by email: {e}")
             return False
@@ -72,8 +73,9 @@ class UserController(BaseController):
     def exists_by_phone(self, phone: str) -> bool:
         try:  
             with self.conn.get_cursor() as cursor:
-                cursor.execute(f"SELECT check_phone_exists_{self.table_name}(%s)", (phone,))
-                return True
+                cursor.execute(f"SELECT 1 FROM {self.table_name} WHERE phone = %s LIMIT 1", (phone,))
+                result = cursor.fetchone()
+                return bool(result)
         except psycopg2.Error as e:
             print(f"Error checking existence by phone: {e}")
             return False
