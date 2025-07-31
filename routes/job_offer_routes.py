@@ -24,6 +24,13 @@ class JobOfferRoutes(BaseRoutes[JobOfferResponse, JobOfferCreate, JobOfferUpdate
                 raise HTTPException(status_code=400, detail="Failed to update item")
             return success
 
+        @self.router.get("/with_company", response_model=list[dict])
+        def get_all_job_offers_with_company():
+            result = self.controller.get_all_job_offers_with_company()
+            if not result:
+                raise HTTPException(status_code=404, detail="No job offers found")
+            return result
+
         @self.router.get("/{job_offer_id}/with_company", response_model=dict)
         def get_job_offer_with_company(job_offer_id: int):
             result = self.controller.get_job_offer_with_company(job_offer_id)

@@ -69,6 +69,20 @@ class JobOfferController(BaseController):
             print(f"Error updating record in table {self.table_name}: {e}")
             return False
 
+    def get_all_job_offers_with_company(self) -> Optional[list[Dict[str, Any]]]:
+        try:
+            query = """
+                SELECT j.*, c.company_name, c.business_type, c.logo
+                FROM job_offers j
+                JOIN companies c ON j.company_id = c.id
+            """
+            with self.conn.get_cursor() as cursor:
+                cursor.execute(query)
+                return cursor.fetchall()
+        except psycopg2.Error as e:
+            print(f"Error fetching all job offers with company: {e}")
+            return None
+    
     def get_job_offer_with_company(self, job_offer_id: int) -> Optional[Dict[str, Any]]:
         try:
             query = """
