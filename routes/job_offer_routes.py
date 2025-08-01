@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from controllers.job_offer_controller import JobOfferController
-from schemas.job_offer import JobOfferResponse, JobOfferCreate, JobOfferUpdate
+from schemas.job_offer import JobOfferResponse, JobOfferCreate, JobOfferUpdate, JobOfferSimpleResponse
 from routes.base_routes import BaseRoutes
 from database.connection import Connection
 from datetime import date
@@ -38,35 +38,35 @@ class JobOfferRoutes(BaseRoutes[JobOfferResponse, JobOfferCreate, JobOfferUpdate
                 raise HTTPException(status_code=404, detail="Job offer not found")
             return result
 
-        @self.router.get("/by_company/{company_id}", response_model=list[JobOfferResponse])
+        @self.router.get("/by_company/{company_id}", response_model=list[JobOfferSimpleResponse])
         def get_job_offers_by_company(company_id: int):
             result = self.controller.get_job_offers_by_company(company_id)
             if not result:
                 raise HTTPException(status_code=404, detail="No job offers found for this company")
             return result
 
-        @self.router.get("/by_title/{title}", response_model=list[JobOfferResponse])
+        @self.router.get("/by_title/{title}", response_model=list[JobOfferSimpleResponse])
         def get_job_offers_by_title(title: str):
             result = self.controller.get_job_offers_by_title(title)
             if not result:
                 raise HTTPException(status_code=404, detail="No job offers found with this title")
             return result
 
-        @self.router.get("/by_category/{category}", response_model=list[JobOfferResponse])
+        @self.router.get("/by_category/{category}", response_model=list[JobOfferSimpleResponse])
         def get_job_offers_by_category(category: str):
             result = self.controller.get_job_offers_by_category(category)
             if not result:
                 raise HTTPException(status_code=404, detail="No job offers found in this category")
             return result
 
-        @self.router.get("/by_start_date/{start_date}", response_model=list[JobOfferResponse])
+        @self.router.get("/by_start_date/{start_date}", response_model=list[JobOfferSimpleResponse])
         def get_job_offers_by_start_date(start_date: date):
             result = self.controller.get_job_offers_by_start_date(start_date)
             if not result:
                 raise HTTPException(status_code=404, detail="No job offers found with this start date")
             return result
 
-        @self.router.get("/all/by_status/{status}", response_model=list[JobOfferResponse])
+        @self.router.get("/all/by_status/{status}", response_model=list[JobOfferSimpleResponse])
         def get_all_job_offers_by_status(status: str):
             result = self.controller.get_all_job_offers_by_status(status)
             if not result:

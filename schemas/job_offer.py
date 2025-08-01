@@ -40,3 +40,7 @@ class JobOfferUpdate(BaseModel):
 
 class JobOfferResponse(JobOfferBase, BaseSchema):
     company: CompanyResponse
+
+class JobOfferSimpleResponse(JobOfferBase, BaseSchema):
+    """Response simple sin objeto company completo"""
+    company_id: int
