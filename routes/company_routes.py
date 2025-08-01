@@ -44,5 +44,22 @@ class CompanyRoutes(BaseRoutes[CompanyResponse, CompanyCreate, CompanyUpdate]):
                 raise HTTPException(status_code=404, detail="No companies found")
             return result
 
+        @self.router.get("/by_user/{user_id}", response_model=dict)
+        def get_company_by_user_id(user_id: int):
+            """
+            Obtener una empresa (company) por su user_id.
+            """
+            try:
+                with self.controller.conn.get_cursor() as cursor:
+                    cursor.execute(
+                        "SELECT * FROM companies WHERE user_id = %s LIMIT 1", (user_id,)
+                    )
+                    company = cursor.fetchone()
+                    if not company:
+                        raise HTTPException(status_code=404, detail="Company not found")
+                    return company
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
 def get_company_routes(conn: Connection) -> APIRouter:
     return CompanyRoutes(conn).router

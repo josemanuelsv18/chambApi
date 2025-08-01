@@ -30,5 +30,22 @@ class WorkerRoutes(BaseRoutes[WorkerResponse, WorkerCreate, WorkerUpdate]):
                 raise HTTPException(status_code=404, detail="Worker not found")
             return result
 
+        @self.router.get("/by_user/{user_id}", response_model=dict)
+        def get_worker_by_user_id(user_id: int):
+            """
+            Obtener un trabajador (worker) por su user_id.
+            """
+            try:
+                with self.controller.conn.get_cursor() as cursor:
+                    cursor.execute(
+                        "SELECT * FROM workers WHERE user_id = %s LIMIT 1", (user_id,)
+                    )
+                    worker = cursor.fetchone()
+                    if not worker:
+                        raise HTTPException(status_code=404, detail="Worker not found")
+                    return worker
+            except Exception as e:
+                raise HTTPException(status_code=500, detail=str(e))
+
 def get_worker_routes(conn: Connection) -> APIRouter:
     return WorkerRoutes(conn).router
