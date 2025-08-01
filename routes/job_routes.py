@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from controllers.job_controller import JobController
-from schemas.job import JobResponse, JobCreate, JobUpdate
+from schemas.job import JobResponse, JobCreate, JobUpdate, JobSimpleResponse
 from routes.base_routes import BaseRoutes
 from database.connection import Connection
 
@@ -30,7 +30,7 @@ class JobRoutes(BaseRoutes[JobResponse, JobCreate, JobUpdate]):
                 raise HTTPException(status_code=404, detail="Job not found")
             return result
 
-        @self.router.get("/{worker_id}/worker", response_model=list[JobResponse])
+        @self.router.get("/{worker_id}/worker", response_model=list[JobSimpleResponse])
         def get_jobs_by_worker(worker_id: int):
             jobs = self.controller.get_jobs_by_worker(worker_id)
             if not jobs:

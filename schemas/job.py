@@ -22,3 +22,9 @@ class JobResponse(JobBase, BaseSchema):
     job_offer: JobOfferResponse
     worker: WorkerResponse
     application: ApplicationResponse
+
+class JobSimpleResponse(JobBase, BaseSchema):
+    """Response simple sin objetos relacionados completos"""
+    job_offer_id: int
+    worker_id: int
+    application_id: int
