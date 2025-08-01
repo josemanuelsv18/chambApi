@@ -12,19 +12,33 @@ class ApplicationController(BaseController):
         data = application_data.model_dump()
         try:
             with self.conn.get_cursor() as cursor:
-                cursor.execute(
-                    f"SELECT sp_create_{self.table_name}(%s, %s, %s, %s, %s, %s)",
-                    (
-                        data['job_offer_id'],
-                        data['worker_id'],
-                        data['application_status'].value if data.get('application_status') else None,
-                        data['applied_at'],
-                        data.get('message'),
-                        0
-                    )
-                )
+                cursor.execute("""
+                    INSERT INTO applications (
+                        job_offer_id, worker_id, status, applied_at, message
+                    ) VALUES (
+                        %s, %s, %s, %s, %s
+                    ) RETURNING id
+                """, (
+                    data['job_offer_id'],
+                    data['worker_id'],
+                    data['application_status'].value,
+                    data['applied_at'],
+                    data.get('message')
+                ))
                 result = cursor.fetchone()
-                print(f"Application created, id: {result}")
+                
+                # Corregir el acceso al resultado
+                if result:
+                    # Si result es un diccionario
+                    if isinstance(result, dict):
+                        print(f"Application created, id: {result.get('id', 'Unknown')}")
+                    # Si result es una tupla/lista
+                    else:
+                        print(f"Application created, id: {result[0]}")
+                else:
+                    print("Application creation failed - no result returned")
+                    return False
+                    
                 return True
         except psycopg2.Error as e:
             print(f"Error creating record in table {self.table_name}: {e}")
