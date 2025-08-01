@@ -45,22 +45,44 @@ class ApplicationController(BaseController):
             return False
 
     def update(self, id: int, application_data: ApplicationUpdate) -> bool:
-        data = application_data.model_dump()
+        data = application_data.model_dump(exclude_unset=True)  # Solo campos que se enviaron
+        
+        if not data:
+            return True  # No hay nada que actualizar
+        
         try:
             with self.conn.get_cursor() as cursor:
-                cursor.execute(
-                    f"SELECT sp_update_{self.table_name}(%s, %s, %s, %s, %s)",
-                    (
-                        id,
-                        data['application_status'].value if data.get('application_status') else None,
-                        data.get('message'),
-                        data.get('company_response'),
-                        data.get('response_at')
-                    )
-                )
-                return True
+                # Construir la query dinámicamente
+                set_clauses = []
+                values = []
+                
+                for key, value in data.items():
+                    if key == 'application_status':
+                        set_clauses.append("status = %s")
+                        values.append(value.value)
+                    elif key == 'responded_at':
+                        set_clauses.append("responded_at = %s")
+                        values.append(value)
+                    else:
+                        set_clauses.append(f"{key} = %s")
+                        values.append(value)
+                
+                values.append(id)  # Para el WHERE
+                
+                query = f"""
+                    UPDATE applications 
+                    SET {', '.join(set_clauses)}, responded_at = NOW()
+                    WHERE id = %s
+                    RETURNING id
+                """
+                
+                cursor.execute(query, values)
+                result = cursor.fetchone()
+                
+                return bool(result)
+                
         except psycopg2.Error as e:
-            print(f"Error updating record in table {self.table_name}: {e}")
+            print(f"Error updating application: {e}")
             return False
 
     def get_applications_by_worker(self, worker_id: int) -> list[Dict[str, Any]]:
